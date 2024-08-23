@@ -1,0 +1,26 @@
+CREATE TABLE fct_sales AS
+SELECT
+    ReferenceID,
+    Product_Name,
+    STRING_AGG(DISTINCT Sales_Agent_Name, ', ') AS Sales_Agents,
+    Country,
+    Campaign_Name,
+    Source,
+    (Total_Amount + Total_Rebill_Amount - COALESCE(Returned_Amount, 0)) AS Revenue,
+    Total_Rebill_Amount AS Rebill_Revenue,
+    Number_Of_Rebills,
+    Discount_Amount,
+    COALESCE(Returned_Amount, 0) AS Returned_Amount,
+    Return_Date_Kyiv AS Return_Date_Kyiv,
+    DATE_ADD(Return_Date_Kyiv, INTERVAL -3 HOUR) AS Return_Date_UTC,
+    DATE_ADD(Return_Date_Kyiv, INTERVAL -7 HOUR) AS Return_Date_New_York,
+    DATEDIFF(Return_Date_Kyiv, Order_Date_Kyiv) AS Days_Between_Return_And_Order,
+    Order_Date_Kyiv AS Order_Date_Kyiv,
+    DATE_ADD(Order_Date_Kyiv, INTERVAL -3 HOUR) AS Order_Date_UTC,
+    DATE_ADD(Order_Date_Kyiv, INTERVAL -7 HOUR) AS Order_Date_New_York
+FROM
+    sales_data
+GROUP BY
+    ReferenceID, Product_Name, Country, Campaign_Name, Source,
+    Total_Amount, Total_Rebill_Amount, Number_Of_Rebills, Discount_Amount,
+    Returned_Amount, Return_Date_Kyiv, Order_Date_Kyiv;
